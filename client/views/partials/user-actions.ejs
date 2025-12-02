@@ -1,0 +1,9 @@
+<div class="actions">
+  <button class="btn btn-success" onclick="getUserInfo()">👤 Get User Info</button>
+  <button class="btn btn-warning" onclick="refreshToken()">🔄 Refresh Token</button>
+  <button class="btn btn-danger" onclick="revokeToken('access')">🚫 Revoke Access Token</button>
+  <button class="btn btn-danger" onclick="revokeToken('refresh')">🚫 Revoke Refresh Token</button>
+  <a href="/logout" class="btn btn-secondary">🚪 Logout</a>
+</div>
+
+<div id="apiResult" class="result-box"></div>

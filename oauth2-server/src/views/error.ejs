@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head', { title: 'Error' }) %>
+    <link rel="stylesheet" href="/css/error.css">
+</head>
+<body>
+    <%- include('partials/error-content', { 
+        statusCode: typeof statusCode !== 'undefined' ? statusCode : 500,
+        message: typeof message !== 'undefined' ? message : 'An unexpected error occurred',
+        error: typeof error !== 'undefined' ? error : null
+    }) %>
+</body>
+</html>

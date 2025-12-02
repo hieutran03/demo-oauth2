@@ -1,0 +1,60 @@
+<div class="card">
+  <div class="card-header">
+    <div class="logo">🔐</div>
+    <h1>Sign In</h1>
+    <p class="subtitle">OAuth2 Authorization Server</p>
+  </div>
+
+  <% if (error) { %>
+    <div class="alert alert-error">
+      <%= error %>
+    </div>
+  <% } %>
+
+  <% if (client_id) { %>
+    <div class="oauth-info">
+      <p><strong>Client:</strong> <%= client_id %></p>
+      <% if (redirect_uri) { %>
+        <p><strong>Redirect:</strong> <%= redirect_uri %></p>
+      <% } %>
+    </div>
+  <% } %>
+
+  <form action="/api/v1/user/login" method="POST">
+    <input type="hidden" name="client_id" value="<%= client_id || '' %>">
+    <input type="hidden" name="redirect_uri" value="<%= redirect_uri || '' %>">
+    <input type="hidden" name="state" value="<%= state || '' %>">
+
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input 
+        type="text" 
+        id="username" 
+        name="username" 
+        placeholder="Enter your username"
+        required
+        autocomplete="username"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input 
+        type="password" 
+        id="password" 
+        name="password" 
+        placeholder="Enter your password"
+        required
+        autocomplete="current-password"
+      >
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      Sign In
+    </button>
+  </form>
+
+  <div class="card-footer">
+    <p>Don't have an account? <a href="/api/v1/user/register">Register here</a></p>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head', { title: 'OAuth2 Demo Client' }) %>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>🔐 OAuth2 Demo Client</h1>
+      <p class="subtitle">Test OAuth2 Authorization Code Flow</p>
+      
+      <%- include('partials/config-info', { config }) %>
+
+      <% if (!user) { %>
+        <p>
+          <span class="status status-logged-out">Not Logged In</span>
+        </p>
+        
+        <%- include('partials/login-guide', { config }) %>
+        
+      <% } else { %>
+        <p>
+          <span class="status status-logged-in">Logged In</span>
+        </p>
+        
+        <%- include('partials/user-info', { user }) %>
+
+        <% if (tokens) { %>
+          <%- include('partials/token-info', { tokens }) %>
+        <% } %>
+
+        <%- include('partials/user-actions') %>
+      <% } %>
+    </div>
+
+    <div class="card">
+      <h2>🧪 API Tester</h2>
+      <p class="subtitle">Test OAuth2 APIs directly</p>
+      
+      <div class="actions">
+        <button class="btn btn-primary" onclick="testAuthorize('<%= config.oauthServerUrl %>', '<%= config.clientId %>', '<%= config.callbackUrl %>')">Test Authorize</button>
+        <button class="btn btn-success" onclick="getClientList('<%= config.oauthServerUrl %>')">Get Client List</button>
+      </div>
+      
+      <div id="testerResult" class="result-box"></div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

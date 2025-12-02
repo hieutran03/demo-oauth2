@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head', { title: 'Login to Your Application' }) %>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <%- include('partials/login-form', { 
+        error: typeof error !== 'undefined' ? error : null,
+        client_id: typeof client_id !== 'undefined' ? client_id : '',
+        redirect_uri: typeof redirect_uri !== 'undefined' ? redirect_uri : '',
+        state: typeof state !== 'undefined' ? state : ''
+    }) %>
+</body>
+</html>

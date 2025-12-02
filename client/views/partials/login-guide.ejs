@@ -1,0 +1,34 @@
+<div class="divider"></div>
+
+<h2>📖 How to Test OAuth2 Flow</h2>
+
+<div class="step">
+  <div class="step-number">1</div>
+  <div class="step-content">
+    <div class="step-title">Register Client (First time only)</div>
+    <div class="step-desc">Click "Register Client" to register this client on the OAuth server</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">2</div>
+  <div class="step-content">
+    <div class="step-title">Create User Account</div>
+    <div class="step-desc">Register a user at <code><%= config.oauthServerUrl %>/api/v1/user/register</code></div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-number">3</div>
+  <div class="step-content">
+    <div class="step-title">Login with OAuth2</div>
+    <div class="step-desc">Click "Login with OAuth2" to start the authorization flow</div>
+  </div>
+</div>
+
+<div class="actions">
+  <button class="btn btn-secondary" onclick="registerClient()">📝 Register Client</button>
+  <a href="/login" class="btn btn-primary">🔑 Login with OAuth2</a>
+</div>
+
+<div id="registerResult" class="result-box"></div>

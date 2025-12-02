@@ -1,0 +1,16 @@
+<div class="token-info">
+  <h2>🎫 Tokens</h2>
+  <p><strong>Access Token:</strong></p>
+  <div class="token-value"><%= tokens.accessToken %></div>
+  <% if (tokens.accessTokenExpiresAt) { %>
+    <p style="margin-top: 10px;"><strong>Expires At:</strong> <%= tokens.accessTokenExpiresAt %></p>
+  <% } %>
+  
+  <% if (tokens.refreshToken) { %>
+    <p style="margin-top: 15px;"><strong>Refresh Token:</strong></p>
+    <div class="token-value"><%= tokens.refreshToken %></div>
+    <% if (tokens.refreshTokenExpiresAt) { %>
+      <p style="margin-top: 10px;"><strong>Refresh Expires At:</strong> <%= tokens.refreshTokenExpiresAt %></p>
+    <% } %>
+  <% } %>
+</div>

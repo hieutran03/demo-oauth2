@@ -1,0 +1,11 @@
+<div class="user-info">
+  <h2>👤 User Information</h2>
+  <p><strong>User ID:</strong> <%= user.id %></p>
+  <p><strong>Username:</strong> <%= user.username %></p>
+  <% if (user.fullName) { %>
+    <p><strong>Full Name:</strong> <%= user.fullName %></p>
+  <% } %>
+  <% if (user.email) { %>
+    <p><strong>Email:</strong> <%= user.email %></p>
+  <% } %>
+</div>
