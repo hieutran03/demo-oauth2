@@ -116,11 +116,13 @@ router.get('/authenticate', asyncHandler(OAuth2Controller.authenticate), asyncHa
 router.post('/revoke', asyncHandler(OAuth2Controller.revoke));
 
 router.get('/login', (req: Request, res: Response) => {
-  const { client_id, redirect_uri, state } = req.query;
+  const { client_id, redirect_uri, state, response_type, scope } = req.query;
   res.render('login', {
     client_id,
     redirect_uri,
     state,
+    response_type: response_type || 'code',
+    scope: scope || '',
     error: null,
   });
 });

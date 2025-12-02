@@ -180,8 +180,9 @@ export async function getRefreshToken(refreshToken: string): Promise<OAuth2Token
 
 // Create default OAuth client
 export async function createDefaultOAuthClient(): Promise<void> {
-  const defaultClientId = 'test-client-id';
-  const defaultClientSecret = 'test-client-secret';
+  const defaultClientId = process.env.DEFAULT_CLIENT_ID || 'demo-client';
+  const defaultClientSecret = process.env.DEFAULT_CLIENT_SECRET || 'demo-client-secret';
+  const defaultCallbackUrl = process.env.DEFAULT_CALLBACK_URL || 'http://localhost:4000/callback';
 
   const existing = await OAuthClient.findOne({ where: { clientId: defaultClientId } });
   if (!existing) {
@@ -190,11 +191,18 @@ export async function createDefaultOAuthClient(): Promise<void> {
       clientId: defaultClientId,
       clientSecret: defaultClientSecret,
       grants: ['authorization_code', 'refresh_token'],
-      callbackUrl: 'http://localhost:3000/callback',
+      callbackUrl: defaultCallbackUrl,
     });
-    console.log('Default OAuth client created.');
+    console.log(`Default OAuth client created: ${defaultClientId}`);
   } else {
-    console.log('Default OAuth client already exists.');
+    // Update callbackUrl if changed
+    if (existing.callbackUrl !== defaultCallbackUrl) {
+      existing.callbackUrl = defaultCallbackUrl;
+      await existing.save();
+      console.log(`Default OAuth client updated: ${defaultClientId}`);
+    } else {
+      console.log(`Default OAuth client already exists: ${defaultClientId}`);
+    }
   }
 }
 

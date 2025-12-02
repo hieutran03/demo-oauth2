@@ -29,15 +29,23 @@ class OAuth2Controller extends BaseController {
 
   authorize = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { client_id, state } = req.query as { client_id?: string; state?: string };
+      const { client_id, state, response_type, redirect_uri, scope } = req.query as { 
+        client_id?: string; 
+        state?: string;
+        response_type?: string;
+        redirect_uri?: string;
+        scope?: string;
+      };
+      
       if (!client_id || !state) {
         throw new BadRequestError('Missing client_id or state');
       }
 
-      const sessionUserId = req.session[`${client_id}_${state}`];
+      // Kiểm tra xem user đã login chưa (lưu trong session)
+      const sessionUserId = req.session.userId;
 
       if (!sessionUserId) {
-        req.session[`${state}_authkey`] = req.query;
+        // Chưa login -> redirect đến trang login với đầy đủ OAuth params
         const queryParams = new URLSearchParams(req.query as any).toString();
         const loginUrl = `/api/v1/oauth/login?${queryParams}`;
         res.redirect(loginUrl);
@@ -68,12 +76,36 @@ class OAuth2Controller extends BaseController {
         },
       });
 
-      await new SuccessResponse({
-        message: 'Authorization successful',
-        data: result,
-      }).send(req, res);
+      // OAuth2 authorize thành công -> redirect về client với authorization code
+      const redirectUrl = new URL(redirect_uri!);
+      redirectUrl.searchParams.set('code', result.authorizationCode);
+      if (state) {
+        redirectUrl.searchParams.set('state', state);
+      }
+      
+      console.log('Redirecting to client with code:', redirectUrl.toString());
+      res.redirect(redirectUrl.toString());
     } catch (err: any) {
       console.log('Authorize error:', err);
+      
+      // Nếu có redirect_uri, redirect về với error
+      const redirect_uri = req.query.redirect_uri as string;
+      const state = req.query.state as string;
+      
+      if (redirect_uri) {
+        try {
+          const errorUrl = new URL(redirect_uri);
+          errorUrl.searchParams.set('error', err.message || 'server_error');
+          if (state) {
+            errorUrl.searchParams.set('state', state);
+          }
+          res.redirect(errorUrl.toString());
+          return;
+        } catch (urlErr) {
+          // Invalid redirect_uri, fall through to JSON response
+        }
+      }
+      
       res.status(err.code || 500).json(
         err instanceof Error ? { error: err.message } : err
       );

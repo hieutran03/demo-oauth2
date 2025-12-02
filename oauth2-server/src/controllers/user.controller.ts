@@ -25,27 +25,43 @@ class UserController extends BaseController {
   oauthLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     this.validate(req.body, userValidate.login);
 
-    const { username, password, state } = req.body;
+    const { username, password, state, client_id, redirect_uri, response_type, scope } = req.body;
+    
     const user = await UserService.findUserByUsernameAndPassword(username, password);
 
     if (!user) {
-      res.render('login', { error: 'Invalid username or password' });
+      res.render('login', { 
+        error: 'Invalid username or password',
+        client_id: client_id || '',
+        redirect_uri: redirect_uri || '',
+        state: state || '',
+        response_type: response_type || '',
+        scope: scope || '',
+      });
       return;
     }
 
-    const originalQuery = req.session[`${state}_authkey`];
-    if (!originalQuery || !originalQuery.client_id) {
-      res.status(400).json({ error: 'Missing original OAuth2 query' });
-      return;
-    }
+    // Lưu userId vào session
+    req.session.userId = user.id;
+    
+    // Tạo lại OAuth authorize URL từ form data
+    const oauthParams = new URLSearchParams();
+    if (client_id) oauthParams.set('client_id', client_id);
+    if (redirect_uri) oauthParams.set('redirect_uri', redirect_uri);
+    if (state) oauthParams.set('state', state);
+    if (response_type) oauthParams.set('response_type', response_type);
+    if (scope) oauthParams.set('scope', scope);
 
-    const clientId = originalQuery.client_id;
-    req.session[`${clientId}_${state}`] = user.id;
-
-    delete req.session[`${state}_authkey`];
-
-    const redirectUrl = `/api/v1/oauth/authorize?${new URLSearchParams(originalQuery).toString()}`;
-    res.redirect(redirectUrl);
+    // Save session trước khi redirect
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        res.status(500).json({ error: 'Session error' });
+        return;
+      }
+      const redirectUrl = `/api/v1/oauth/authorize?${oauthParams.toString()}`;
+      res.redirect(redirectUrl);
+    });
   };
 
   logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

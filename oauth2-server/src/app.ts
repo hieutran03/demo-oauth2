@@ -18,10 +18,14 @@ const app: Application = express();
 
 // View engine
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// Khi dev: __dirname = src/, khi build: __dirname = dist/
+// Cả 2 trường hợp đều cần trỏ về src/views
+const viewsPath = path.join(__dirname, process.env.NODE_ENV === 'dev' ? 'views' : '../src/views');
+const publicPath = path.join(__dirname, process.env.NODE_ENV === 'dev' ? 'public' : '../src/public');
+app.set('views', viewsPath);
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(publicPath));
 
 // CORS
 app.use(

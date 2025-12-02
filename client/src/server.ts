@@ -1,5 +1,6 @@
 import express, { Application } from 'express';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import config from './config';
 import indexRoutes from './routes/index';
@@ -11,13 +12,17 @@ const app: Application = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(
   session({
     secret: process.env.SESSION_SECRET || 'demo-secret',
-    resave: false,
+    resave: true,
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: { 
+      secure: false,
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    },
   })
 );
 

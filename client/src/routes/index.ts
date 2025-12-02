@@ -16,7 +16,13 @@ router.get('/', (req: Request, res: Response) => {
 // Start OAuth2 flow - redirect to authorization server
 router.get('/login', (req: Request, res: Response) => {
   const state = Math.random().toString(36).substring(7);
-  req.session.oauthState = state;
+  
+  // Lưu state vào cookie (tồn tại 10 phút)
+  res.cookie('oauth_state', state, {
+    maxAge: 10 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'lax',
+  });
 
   const authUrl = new URL(`${config.oauthServerUrl}/api/v1/oauth/authorize`);
   authUrl.searchParams.set('client_id', config.clientId);
@@ -26,6 +32,8 @@ router.get('/login', (req: Request, res: Response) => {
   authUrl.searchParams.set('scope', 'read write');
 
   console.log('Redirecting to:', authUrl.toString());
+  console.log('State saved to cookie:', state);
+  
   res.redirect(authUrl.toString());
 });
 
@@ -37,14 +45,25 @@ router.get('/callback', async (req: Request, res: Response) => {
     error?: string;
   };
 
+  // Lấy state từ cookie
+  const savedState = req.cookies?.oauth_state;
+  
+  console.log('=== CALLBACK ===');
+  console.log('State from query:', state);
+  console.log('State from cookie:', savedState);
+
   if (error) {
     return res.render('error', { error: `OAuth Error: ${error}` });
   }
 
-  // Verify state
-  if (state !== req.session.oauthState) {
-    return res.render('error', { error: 'Invalid state parameter' });
+  // Verify state từ cookie
+  if (!savedState || state !== savedState) {
+    console.log('State mismatch!');
+    return res.render('error', { error: `Invalid state parameter. Expected: ${savedState}, Got: ${state}` });
   }
+  
+  // Xóa cookie state sau khi verify
+  res.clearCookie('oauth_state');
 
   if (!code) {
     return res.render('error', { error: 'No authorization code received' });

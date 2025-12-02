@@ -37,6 +37,7 @@ User.init(
       type: DataTypes.STRING(24),
       primaryKey: true,
       allowNull: false,
+      defaultValue: () => new ObjectId().toHexString(),
     },
     username: {
       type: DataTypes.STRING,

@@ -19,6 +19,8 @@ class UserValidator {
       client_id: Joi.string(),
       redirect_uri: Joi.string(),
       state: Joi.string(),
+      response_type: Joi.string(),
+      scope: Joi.string().allow(''),
     }).required();
 
     return schema.validate(body);
